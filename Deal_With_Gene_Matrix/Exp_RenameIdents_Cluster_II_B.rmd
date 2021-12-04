@@ -1,0 +1,220 @@
+---
+title: "process_batchcorrection"
+author: "zhong"
+date: "8/12/2021"
+output: html_document
+---
+
+## Clear workspace
+```{r packages, cache=FALSE}
+rm(list=ls())
+set.seed(123)
+WORKDIR = '~/Singel-Cell-Analysis-From-Zero/Deal_With_Gene_Matrix/'
+setwd(WORKDIR)
+
+
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+library(showtext)  
+library(ggprism)
+library(rstatix)
+```
+
+```{r setting}
+showtext_auto(TRUE)
+font_add("Times New Roman", regular = "/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman.ttf")
+PATH = "../Figure1_Cluster_TMP"
+if (!dir.exists(PATH)){
+  dir.create(path = PATH, recursive = TRUE)
+} 
+theme_me <- theme(text = element_text(family="Times New Roman", size=10.5, face = "plain"),
+                  axis.text = element_text(family="Times New Roman", size=10.5, face = "plain"),
+                  plot.caption = element_text(family="Times New Roman", size=10.5, face = "italic"),
+                  plot.title = element_text(family="Times New Roman", size=12, face = "bold"),
+                  plot.subtitle = element_text(family="Times New Roman", size=11, face = "bold"),
+                  legend.title = element_text(family="Times New Roman", size=11, face = "plain"),
+                  strip.text = element_text(family="Times New Roman", size=10.5, face = "italic"))
+
+theme_set(theme_me)
+```
+
+
+## #################################### Part II For SubCluster #########################################
+## Data loading
+# Noted that sct transformed can also be replaced with NormalizeData(), ScaleData() and FindVariableFeatures()
+```{r loadrds}
+pbmc <- readRDS("../output/ASSHD_pbmc_cluster.rds")
+DefaultAssay(pbmc) <- 'RNA'
+```
+
+```{r clusterII.reclusterT}
+Idents(pbmc) <- "celltypeI"
+celltype <- c("B")
+# pbmcSub <- subset(pbmc, idents = celltype)
+# pbmcSub = subset(x = pbmc, subset = CD3D < 3 & CD3E < 3 & CD3G < 3 & GNLY < 3 & CD79A >= 3, idents = celltype)
+pbmcSub =  subset(x = pbmc, subset = CD3D < 1 & CD3E < 1 & CD3G < 1 & NKG7 < 1 & LYZ < 1 & CD79A >= 1, idents = celltype)
+DefaultAssay(pbmcSub) <- "RNA"
+
+scrna.list <- SplitObject(pbmcSub, split.by = "orig.ident")
+scrna.list <- lapply(X=scrna.list, FUN = SCTransform)
+# select features that are repeatedly variable across datasets for integration
+features <- SelectIntegrationFeatures(object.list = scrna.list, nfeatures = 3000)
+scrna.list <- PrepSCTIntegration(object.list = scrna.list, anchor.features = features)
+# Perform integration
+scrna.list <- lapply(X=scrna.list, FUN = RunPCA, verbose = FALSE, features = features)
+pbmc3k.anchors <- FindIntegrationAnchors(object.list = scrna.list, anchor.features = features, normalization.method = "SCT", reduction = "rpca", dim = 1:15)
+# this command creates an 'integrated' data assay
+rm(scrna.list)
+pbmcSub_inter <- IntegrateData(anchorset = pbmc3k.anchors, normalization.method = "SCT", dim = 1:15)
+saveRDS(pbmcSub_inter, file = "../output/pbmc_ASSHD_pbmc3k_B.orig.rds")
+```
+
+
+```{r clusterII.reclusterT.workflow}
+pbmcSub <- pbmcSub_inter
+DefaultAssay(pbmcSub) <- "integrated"
+pbmcSub <- ScaleData(object = pbmcSub, verbose = FALSE)
+pbmcSub <- RunPCA(object = pbmcSub, verbose = FALSE)
+pbmcSub <- RunUMAP(object = pbmcSub, reduction = "pca", dims = 1:15)
+pbmcSub <- FindNeighbors(object = pbmcSub, reduction = "pca", dims = 1:15)
+pbmcSub <- FindClusters(object = pbmcSub, resolution = c(0.4, 0.6, 0.8, 1.0, 1.2, 1.4))
+saveRDS(pbmcSub, file = "../output/ASSHD_pbmc_B_orig_20200905.rds")
+```
+
+
+
+## Cluster II: 
+# T
+## Deal with Cluster I： "B"
+## 
+
+### Step 1. Cluster with various resolutions
+```{r clusterII.clustertree}
+plot.pca.elbow <- ElbowPlot(pbmcSub)
+filename = paste(PATH, "/plot.Bsubcluster.pca.elbow.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1000, height = 1000) 
+print(plot.pca.elbow)
+dev.off()
+
+Idents(pbmcSub) <- "integrated_snn_res.0.4"
+p1 <- DimPlot(pbmcSub, reduction = "umap")
+Idents(pbmcSub) <- "integrated_snn_res.0.6"
+p2 <- DimPlot(pbmcSub, reduction = "umap")
+Idents(pbmcSub) <- "integrated_snn_res.0.8"
+p3 <- DimPlot(pbmcSub, reduction = "umap")
+Idents(pbmcSub) <- "integrated_snn_res.1"
+p4 <- DimPlot(pbmcSub, reduction = "umap")
+Idents(pbmcSub) <- "integrated_snn_res.1.2"
+p5 <- DimPlot(pbmcSub, reduction = "umap")
+Idents(pbmcSub) <- "integrated_snn_res.1.4"
+p6 <- DimPlot(pbmcSub, reduction = "umap")
+plot.Bsubcluster.resolutions <- p1 + p2 + p3 + p4 + p5 + p6
+filename = paste(PATH, "/plot.Bsubcluster.resolutions.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.Bsubcluster.resolutions)
+dev.off()
+library("clustree")
+plot_Bsubtree <- clustree(pbmcSub, prefix = "integrated_snn_res.")
+filename = paste(PATH, "/plot.b.sub.clustertree.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1000, height = 2000) 
+print(plot_Bsubtree)
+dev.off()
+```
+
+### Step 2. Find markers and plot heatmap
+```{r writemarkers}
+DefaultAssay(pbmcSub) <- "RNA"
+Idents(pbmcSub) <- "integrated_snn_res.0.4"
+pbmcSub.norm <- NormalizeData(pbmcSub, verbose = FALSE)
+Idents(pbmcSub.norm) <- "integrated_snn_res.0.4"
+DefaultAssay(pbmcSub.norm) <- "RNA"
+pbmcSub.markers <- FindAllMarkers(pbmcSub.norm, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.3)
+pbmcSub.markers %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC) -> top10
+pbmcSub.markers %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC) -> top5
+filename <- paste("Bsubsetmarkers_top10_normscale.csv", sep = "")
+write.csv(top10, file =paste(PATH, filename, sep="/")) 
+filename <- paste("Bsubsetmarkers_normscale.csv", sep = "")
+write.csv(pbmcSub.markers, file =paste(PATH, filename, sep="/")) 
+```
+
+```{r subsetBheatmap}
+Idents(pbmcSub) <- "integrated_snn_res.0.4"
+DefaultAssay(pbmcSub) <- "RNA"
+pbmcSub.heat <- subset(x = pbmcSub.norm, downsample = 100)
+print(levels(pbmcSub.heat))
+pbmcSub.heat <- NormalizeData(pbmcSub.heat)
+all.genes <- rownames(pbmcSub.heat)
+pbmcSub.heat <- ScaleData(pbmcSub.heat, features = all.genes)
+plot.heatmap <- DoHeatmap(pbmcSub.heat, features = top10$gene) + theme_me
+filename = paste(PATH, "/plot.heatmap.Bsubset.pdf",sep="") # 
+pdf(filename, width=15, height=15)
+print(plot.heatmap)
+dev.off()
+```
+
+
+### Step 3. Compare markers with the official identification genes of expected cell types.
+```{r subTidents}
+# pbmcSub <- readRDS("../output/ASSHD_pbmcSub_orig_20200905.rds")
+DefaultAssay(pbmcSub) <- "RNA"
+Idents(pbmcSub) <- "integrated_snn_res.0.4"
+pbmcSub.norm <- NormalizeData(pbmcSub, verbose = FALSE)
+clusterII.B <- c("CD79A", "MS4A1", "CD38", "CD19", "CD27", 
+                  "IGHM", "IGHD", "IGHA1", "IGHE", "IGKC", "IGLC1", 
+                  "MZB1", "AIM2", "FCER2", "TCL1A", "CCR7")
+plot.b.sub.feat.only <- FeaturePlot(pbmcSub.norm, features = clusterII.B , reduction = "umap", label = TRUE)
+filename = paste(PATH, "/plot.b.sub.feat.only.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1000, height = 1000) 
+print(plot.b.sub.feat.only)
+dev.off()
+```
+
+
+### Step 4. Identify B cell SubCluster celltypes with knowledge
+
+```{r rename.Bidents}
+pbmc_B <- pbmcSub
+pbmc_B <- readRDS("../output/ASSHD_pbmc_B_orig_20200905.rds")
+DefaultAssay(pbmc_B) <- "RNA"
+Idents(pbmc_B) <- "integrated_snn_res.0.4"
+table(Idents(pbmc_B))
+pbmc_B <- RenameIdents(pbmc_B, 
+            "0" = "Naive B1", 
+            "1" = "Naive B2",
+            "3" = "Naive B3",
+            "2" = "lgM+ Memory B",
+            "4" = "Plasma", 
+            "5" = "lgM- Memory B",
+            "6" = "TNF B",
+            "7" = "IFN B"
+            )
+cluster.names <-  c("Naive B1", "Naive B2", "Naive B3","lgM+ Memory B", "lgM- Memory B", "Plasma", "TNF B", "IFN B")
+levels(x = pbmc_B) <- cluster.names
+pbmc_B[["celltypeII_B"]] <- Idents(pbmc_B)
+saveRDS(pbmc_B, file = "../output/ASSHD_pbmc_subcluster_B.rds")
+```
+
+```{r rename.Bidents}
+pbmc_B <- pbmcSub
+pbmc_B <- readRDS("../output/ASSHD_pbmc_B_orig_20200905.rds")
+DefaultAssay(pbmc_B) <- "RNA"
+Idents(pbmc_B) <- "integrated_snn_res.0.4"
+table(Idents(pbmc_B))
+pbmc_B <- RenameIdents(pbmc_B, 
+            "0" = "Naive B", 
+            "1" = "Naive B",
+            "3" = "Naive B",
+            "2" = "lgM+ Memory B",
+            "4" = "Plasma", 
+            "5" = "lgM- Memory B",
+            "6" = "lgM+ Memory B",
+            "7" = "Naive B"
+            )
+cluster.names <-  c("Naive B", "lgM+ Memory B", "lgM- Memory B", "Plasma")
+levels(x = pbmc_B) <- cluster.names
+pbmc_B[["celltypeII_B"]] <- Idents(pbmc_B)
+saveRDS(pbmc_B, file = "../output/ASSHD_pbmc_subcluster_Bcom.rds")
+```
+

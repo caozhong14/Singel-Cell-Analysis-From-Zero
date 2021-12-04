@@ -1,0 +1,56 @@
+[1] "Loading data: pbmc_ASSHD_pbmc3k.orig.rds"
+[1] "Loaded"
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 54496
+Number of edges: 1787796
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.9245
+Number of communities: 14
+Elapsed time: 21 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 54496
+Number of edges: 1787796
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.9035
+Number of communities: 19
+Elapsed time: 19 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 54496
+Number of edges: 1787796
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8866
+Number of communities: 21
+Elapsed time: 17 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 54496
+Number of edges: 1787796
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8717
+Number of communities: 25
+Elapsed time: 18 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 54496
+Number of edges: 1787796
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8606
+Number of communities: 28
+Elapsed time: 18 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 54496
+Number of edges: 1787796
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8507
+Number of communities: 31
+Elapsed time: 17 seconds

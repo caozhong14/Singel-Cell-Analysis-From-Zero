@@ -1,0 +1,30 @@
+[1] "The input file is ../output/ASSHD_pbmc_orig.rds"
+[1] "The input celltype is integrated_snn_res.0.8"
+[1] "The output file prefix is ../Figure1_Cluster_Primarytest/"
+treat
+ASS-ILD      HD 
+  29275   25330 
+[1] "Load success"
+
+   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15 
+6239 6164 5351 5010 4711 4386 4207 3296 3171 2868 2528 2080 1589 1289  558  544 
+  16   17   18   19   20 
+ 167  164  138  124   21 
+[1] "count and subset"
+[1] "count and subset"
+[1] "The output PATH is ../Figure1_Cluster_Primarytest/"
+[1] "The output figure is cluster.primary.pdf"
+[1] "The output figure is cluster.primary.patient.pdf"
+[1] "The output figure is cluster.markers.vln.pdf"
+[1] "The output figure is cluster.markers.vln.rev.pdf"
+[1] "The output figure is cluster.markers.dot.rev.pdf"
+[1] "The output figure is cluster.markers.feat.pdf"
+null device 
+          1 
+[1] "The output PATH is ../Figure1_Cluster_Primarytest/"
+[1] "The output figure is count_patient_proportion.pdf"
+[1] "The output figure is count_treat_proportion.pdf"
+[1] "The output figure is count_treat_box.pdf"
+[1] "Process success"
+[1] "***************"
+[1] ""

@@ -1,0 +1,333 @@
+---
+title: "process_batchcorrection"
+author: "zhong"
+date: "8/12/2021"
+output: html_document
+---
+
+## Clear workspace
+```{r packages, cache=FALSE}
+rm(list=ls())
+set.seed(123)
+WORKDIR = '~/Singel-Cell-Analysis-From-Zero/Deal_With_Gene_Matrix/'
+setwd(WORKDIR)
+
+
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+library(showtext)  
+library(ggprism)
+library(rstatix)
+```
+
+```{r setting}
+showtext_auto(TRUE)
+font_add("Times New Roman", regular = "/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman.ttf")
+PATH = "../Figure1_Cluster_TMP"
+if (!dir.exists(PATH)){
+  dir.create(path = PATH, recursive = TRUE)
+} 
+theme_me <- theme(text = element_text(family="Times New Roman", size=10.5, face = "plain"),
+                  axis.text = element_text(family="Times New Roman", size=10.5, face = "plain"),
+                  plot.caption = element_text(family="Times New Roman", size=10.5, face = "italic"),
+                  plot.title = element_text(family="Times New Roman", size=12, face = "bold"),
+                  plot.subtitle = element_text(family="Times New Roman", size=11, face = "bold"),
+                  legend.title = element_text(family="Times New Roman", size=11, face = "plain"),
+                  strip.text = element_text(family="Times New Roman", size=10.5, face = "italic"))
+
+theme_set(theme_me)
+```
+
+
+## #################################### Part II For SubCluster #########################################
+## Data loading
+# Noted that sct transformed can also be replaced with NormalizeData(), ScaleData() and FindVariableFeatures()
+```{r loadrds}
+pbmc <- readRDS("../output/ASSHD_pbmc_cluster.rds")
+DefaultAssay(pbmc) <- 'RNA'
+```
+
+```{r clusterII.reclusterT}
+Idents(pbmc) <- "celltypeI"
+celltype <- c("resting CD4T", "activated CD4T", "CD8 T", "gdT", "Pro T")
+# 
+# pbmc_T <- subset(pbmc, idents = celltype)
+pbmc_T <- subset(pbmc, subset = CD3D >= 1, idents = celltype)
+DefaultAssay(pbmc_T) <- "RNA"
+
+scrna.list <- SplitObject(pbmc_T, split.by = "orig.ident")
+scrna.list <- lapply(X=scrna.list, FUN = SCTransform)
+# select features that are repeatedly variable across datasets for integration
+features <- SelectIntegrationFeatures(object.list = scrna.list, nfeatures = 3000)
+scrna.list <- PrepSCTIntegration(object.list = scrna.list, anchor.features = features)
+# Perform integration
+scrna.list <- lapply(X=scrna.list, FUN = RunPCA, verbose = FALSE, features = features)
+pbmc3k.anchors <- FindIntegrationAnchors(object.list = scrna.list, anchor.features = features, normalization.method = "SCT", reduction = "rpca", dim = 1:15)
+# this command creates an 'integrated' data assay
+rm(scrna.list)
+pbmc_T_inter <- IntegrateData(anchorset = pbmc3k.anchors, normalization.method = "SCT", dim = 1:15)
+saveRDS(pbmc_T_inter, file = "../output/pbmc_ASSHD_pbmc3k_T.orig.rds")
+```
+
+
+```{r clusterII.reclusterT.workflow}
+pbmc_T <- pbmc_T_inter
+DefaultAssay(pbmc_T) <- "integrated"
+pbmc_T <- ScaleData(object = pbmc_T, verbose = FALSE)
+pbmc_T <- RunPCA(object = pbmc_T, verbose = FALSE)
+pbmc_T <- RunUMAP(object = pbmc_T, reduction = "pca", dims = 1:15)
+pbmc_T <- FindNeighbors(object = pbmc_T, reduction = "pca", dims = 1:15)
+pbmc_T <- FindClusters(object = pbmc_T, resolution = c(0.4, 0.6, 0.8, 1.0, 1.2, 1.4))
+saveRDS(pbmc_T, file = "../output/ASSHD_pbmc_T_orig_20200905.rds")
+```
+
+
+
+## Cluster II: 
+# T
+## Deal with Cluster I： "resting CD4T", "activated CD4T", "CD8 T", "gdT", "Pro T"
+## 
+
+### Step 1. Cluster with various resolutions
+```{r clusterII.clustertree}
+plot.pca.elbow <- ElbowPlot(pbmc_T)
+filename = paste(PATH, "/plot.Tsubcluster.pca.elbow.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1000, height = 1000) 
+print(plot.pca.elbow)
+dev.off()
+
+Idents(pbmc_T) <- "integrated_snn_res.0.4"
+p1 <- DimPlot(pbmc_T, reduction = "umap")
+Idents(pbmc_T) <- "integrated_snn_res.0.6"
+p2 <- DimPlot(pbmc_T, reduction = "umap")
+Idents(pbmc_T) <- "integrated_snn_res.0.8"
+p3 <- DimPlot(pbmc_T, reduction = "umap")
+Idents(pbmc_T) <- "integrated_snn_res.1"
+p4 <- DimPlot(pbmc_T, reduction = "umap")
+Idents(pbmc_T) <- "integrated_snn_res.1.2"
+p5 <- DimPlot(pbmc_T, reduction = "umap")
+Idents(pbmc_T) <- "integrated_snn_res.1.4"
+p6 <- DimPlot(pbmc_T, reduction = "umap")
+plot.Tsubcluster.resolutions <- p1 + p2 + p3 + p4 + p5 + p6
+filename = paste(PATH, "/plot.Tsubcluster.resolutions.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.Tsubcluster.resolutions)
+dev.off()
+library("clustree")
+plot_Tsubtree <- clustree(pbmc_T, prefix = "integrated_snn_res.")
+filename = paste(PATH, "/plot.t.sub.clustertree.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1000, height = 2000) 
+print(plot_Tsubtree)
+dev.off()
+```
+
+### Step 2. Find markers and plot heatmap
+```{r writemarkers}
+DefaultAssay(pbmc_T) <- "RNA"
+Idents(pbmc_T) <- "integrated_snn_res.0.8"
+pbmc_T.norm <- NormalizeData(pbmc_T, verbose = FALSE)
+Idents(pbmc_T.norm) <- "integrated_snn_res.0.8"
+DefaultAssay(pbmc_T.norm) <- "RNA"
+pbmc_T.markers <- FindAllMarkers(pbmc_T.norm, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.3)
+pbmc_T.markers %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC) -> top10
+pbmc_T.markers %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC) -> top5
+filename <- paste("Tsubsetmarkers_top10_normscale.csv", sep = "")
+write.csv(top10, file =paste(PATH, filename, sep="/")) 
+filename <- paste("Tsubsetmarkers_normscale.csv", sep = "")
+write.csv(pbmc_T.markers, file =paste(PATH, filename, sep="/")) 
+```
+
+```{r subsetBheatmap}
+Idents(pbmc_T) <- "integrated_snn_res.0.8"
+DefaultAssay(pbmc_T) <- "RNA"
+pbmc_T.heat <- subset(x = pbmc_T, downsample = 100)
+print(levels(pbmc_T.heat))
+pbmc_T.heat <- NormalizeData(pbmc_T.heat)
+all.genes <- rownames(pbmc_T.heat)
+pbmc_T.heat <- ScaleData(pbmc_T.heat, features = all.genes)
+plot.heatmap <- DoHeatmap(pbmc_T.heat, features = top10$gene) + theme_me
+filename = paste(PATH, "/plot.heatmap.Tsubset.pdf", sep="") # 
+pdf(filename, width=15, height=15)
+print(plot.heatmap)
+dev.off()
+```
+
+
+### Step 3. Compare markers with the official identification genes of expected cell types.
+```{r subTidents}
+pbmc_T <- readRDS("../output/ASSHD_pbmc_T_orig_20200905.rds")
+DefaultAssay(pbmc_T) <- "RNA"
+Idents(pbmc_T) <- "integrated_snn_res.0.8"
+pbmc_T.norm <- NormalizeData(pbmc_T, verbose = FALSE)
+clusterII.T <- c("CD3D", "CCR7", "CD27", "SELL", "IL7R", "CD4", "CTLA4", "CD8A", "CD8B", "GZMK", "ZNF683", "CXCR3", "TBX21", "IFNG", "GATA3", "CCR6", "RORC", "IL17", "CCR4", "IL4", "FOXP3", "IL2RA", "CD40LG", "LINC02446", "TOP2A", "TRGV9", "FXYD2", "GZMH", "GNLY")
+# clusterII.T <- c("CD3D", "CCR7", "CD27", "SELL", "IL7R", "CD4", "CTLA4", "CD8A", "CD8B", "GZMK", "GPR183", "S100A4", "CCR4", "TRDV2", "TRGV9", )
+plot.t.sub.feat.only <- FeaturePlot(pbmc_T.norm, features = clusterII.T , reduction = "umap", label = TRUE)
+filename = paste(PATH, "/plot.t.sub.feat.only.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1000, height = 2000) 
+print(plot.t.sub.feat.only)
+dev.off()
+```
+
+
+## Cluster II: 
+# naive CD4 T / CD4 Naive (CD3D, CD4, IL7R, CCR7, TCF7, LEF1)
+# central memory CD4 T / CD4 TCM (CD3D, CD4, IL7R, CCR7, TCF7, LEF1, GPR183, S100A4)
+# effector memory CD4 T / CD4 TEM (CD3D, CD4, IL7R, TNFRSF4, GNLY, GZMH, FGFBP2, GZMA, S100A4)
+# naive CD8 T / CD8 Naive (CD3D, CD8A, CD8B, CD45RA+, CD27+, CCR7+, SELL, LEF1)
+# central memory CD8T / CD8 CTL (CD3D, CD8A, CD8B, CD45RA-, CD27+, CCR7+, SELL, CD38, GPR183, TCF1, STAT3)
+# effector memory CD8 T / CD8 TEM (CD3D, CD8A, CD8B, CD45RA-, CD27-, CCR7-, STAT4, NKG7, GNLY, GZMH, GZMA, GZMB, GZMK, PRF1) 
+
+# gdT (CD3D, TRDV2, TRGV9)
+# NKT (CD3D, FCGR3A, NKG7)
+# Treg (CD3D, FOXP3, CTLA4)
+# MAIT (CD3D, SLC4A10,TRAV1-2)
+# Pro T (CD3D, MKI67, RRM2, STMN1)
+
+## 流式   单细胞
+## CD62L  SELL
+```{r clusterI}
+pbmc.input <- pbmc_T.norm
+Idents(pbmc.input ) <- "integrated_snn_res.0.8"
+clusterII.cd4t <- c("CD3D", "CD4", "IL7R", "CCR7", "TCF7", "LEF1")
+clusterII.4tcm <- c("CD3D", "CD4", "IL7R", "CCR7", "TCF7", "LEF1", "GPR183", "S100A4")
+clusterII.4tem <- c("CD3D", "CD4", "IL7R", "TNFRSF4", "GNLY", "GZMH", "FGFBP2", "GZMA", "S100A4")
+clusterII.cd8t <- c("CD3D", "CD8A", "CD8B", "CD45RA", "CD27", "CCR7", "SELL", "LEF1")
+clusterII.8tcm <- c("CD3D", "CD8A", "CD8B", "CD27", "CCR7", "SELL", "CD38", "GPR183", "TCF1", "STAT3")
+clusterII.8tem <- c("CD3D", "CD8A", "CD8B", "CD45RA", "STAT4", "NKG7", "GNLY", "GZMH", "GZMA", "GZMB", "GZMK", "PRF1")
+
+clusterII.gdt <- c("CD3D", "TRDV2", "TRGV9")
+clusterII.nkt <- c("CD3D", "FCGR3A", "NKG7", "KLRF1", "NCAM1")
+clusterII.treg <- c("CD3D", "FOXP3", "CTLA4")
+clusterII.mait <- c("CD3D", "SLC4A10", "TRAV1-2")
+clusterII.prot <- c("CD3D", "MKI67", "RRM2", "STMN1")
+
+plot.cd4t.feat <- FeaturePlot(pbmc.input, reduction = "umap", clusterII.cd4t, label = TRUE) + theme_me
+plot.4tcm.feat <- FeaturePlot(pbmc.input, reduction = "umap", clusterII.4tcm, label = TRUE) + theme_me
+plot.4tem.feat <- FeaturePlot(pbmc.input, reduction = "umap", clusterII.4tem, label = TRUE) + theme_me
+plot.cd8t.feat <- FeaturePlot(pbmc.input, reduction = "umap", clusterII.cd8t, label = TRUE) + theme_me
+plot.8tcm.feat <- FeaturePlot(pbmc.input, reduction = "umap", clusterII.8tcm, label = TRUE) + theme_me
+plot.8tem.feat <- FeaturePlot(pbmc.input, reduction = "umap", clusterII.8tem, label = TRUE) + theme_me
+
+plot.gdt.feat <- FeaturePlot(pbmc.input, reduction = "umap", clusterII.gdt, label = TRUE) + theme_me
+plot.nkt.feat <- FeaturePlot(pbmc.input, reduction = "umap", clusterII.nkt, label = TRUE) + theme_me
+plot.treg.feat <- FeaturePlot(pbmc.input, reduction = "umap", clusterII.treg, label = TRUE) + theme_me
+plot.mait.feat <- FeaturePlot(pbmc.input, reduction = "umap", clusterII.mait, label = TRUE) + theme_me
+plot.prot.feat <- FeaturePlot(pbmc.input, reduction = "umap", clusterII.prot, label = TRUE) + theme_me
+
+
+filename = paste(PATH, "/plot.t.cd4t.feat.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.cd4t.feat)
+dev.off()
+filename = paste(PATH, "/plot.t.4tcm.feat.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.4tcm.feat)
+dev.off()
+filename = paste(PATH, "/plot.t.4tem.feat.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.4tem.feat)
+dev.off()
+filename = paste(PATH, "/plot.t.cd8t.feat.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.cd8t.feat)
+dev.off()
+filename = paste(PATH, "/plot.t.8tcm.feat.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.8tcm.feat)
+dev.off()
+filename = paste(PATH, "/plot.t.8tem.feat.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.8tem.feat)
+dev.off()
+filename = paste(PATH, "/plot.t.gdt.feat.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.gdt.feat)
+dev.off()
+filename = paste(PATH, "/plot.t.nkt.feat.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.nkt.feat)
+dev.off()
+filename = paste(PATH, "/plot.t.treg.feat.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.treg.feat)
+dev.off()
+filename = paste(PATH, "/plot.t.mait.feat.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.mait.feat)
+dev.off()
+filename = paste(PATH, "/plot.t.prot.feat.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1400, height = 1000) 
+print(plot.prot.feat)
+dev.off()
+
+```
+
+
+
+## Step 4. Identify T cell SubCluster celltypes with knowledge
+```{r rename.Tidents}
+pbmc_T <- readRDS("../output/ASSHD_pbmc_T_orig_20200905.rds")
+DefaultAssay(pbmc_T) <- "RNA"
+Idents(pbmc_T) <- "integrated_snn_res.0.8"
+table(Idents(pbmc_T))
+pbmc_T <- RenameIdents(pbmc_T, 
+            "0"  = "CD4 TCM1",
+            "1"  = "CD4 Naive 1",
+            "2"  = "CD4 TCM2",
+            "3"  = "CD4 Naive 2", 
+            "4"  = "CD8 Naive", 
+            "5"  = "CD8 TEM GZMK",
+            "6"  = "CD8 TEM GNLY",
+            "7"  = "CD8 TEM TRAV27",
+            "8"  = "CD4 TEM TRBV7-2",
+            "9"  = "gdT",
+            "10"  = "Treg",
+            "11"  = "NKT",
+            "12" = "MAIT",
+            "13" = "CD4 TEM TRBV20-1",
+            "14"  = "CD4 Naive 3",
+            "15"  = "CD4 TCM3",
+            "16"  = "DNT",
+            "17" = "Pro T")
+cluster.names <-  c("CD4 Naive 1", "CD4 Naive 2", "CD4 Naive 3", "CD4 TCM1", "CD4 TCM2", "CD4 TCM3", "CD4 TEM TRBV7-2", "CD4 TEM TRBV20-1", 
+                    "CD8 Naive", "CD8 TEM GZMK", "CD8 TEM GNLY", "CD8 TEM TRAV27", 
+                    "gdT", "Treg", "NKT", "MAIT", "DNT", "Pro T")
+levels(x = pbmc_T) <- cluster.names
+pbmc_T[["celltypeII_T"]] <- Idents(pbmc_T)
+saveRDS(pbmc_T, file = "../output/ASSHD_pbmc_subcluster_T.rds")
+```
+
+## Step 4. Identify T cell SubCluster celltypes with knowledge
+```{r rename.Tidents}
+pbmc_T <- readRDS("../output/ASSHD_pbmc_T_orig_20200905.rds")
+DefaultAssay(pbmc_T) <- "RNA"
+Idents(pbmc_T) <- "integrated_snn_res.0.8"
+table(Idents(pbmc_T))
+pbmc_T <- RenameIdents(pbmc_T, 
+            "0"  = "CD4 TCM",
+            "1"  = "CD4 Naive",
+            "2"  = "CD4 TCM",
+            "3"  = "CD4 Naive", 
+            "4"  = "CD8 Naive", 
+            "5"  = "CD8 TEM",
+            "6"  = "CD8 TEM",
+            "7"  = "CD8 TEM",
+            "8"  = "CD4 TEM",
+            "9"  = "gdT",
+            "10"  = "Treg",
+            "11"  = "NKT",
+            "12" = "MAIT",
+            "13" = "CD4 TEM",
+            "14"  = "CD4 Naive",
+            "15"  = "CD4 TCM",
+            "16"  = "DNT",
+            "17" = "Pro T")
+cluster.names <-  c("CD4 Naive", "CD4 TCM", "CD4 TEM", 
+                    "CD8 Naive", "CD8 TEM", 
+                    "gdT", "Treg", "NKT", "MAIT", "DNT", "Pro T")
+levels(x = pbmc_T) <- cluster.names
+pbmc_T[["celltypeII_T"]] <- Idents(pbmc_T)
+saveRDS(pbmc_T, file = "../output/ASSHD_pbmc_subcluster_Tcom.rds")
+```

@@ -1,0 +1,27 @@
+[1] "The input file is ../output/ASSHD_pbmc_subcluster_Bcom.rds"
+[1] "The input celltype is celltypeII_B"
+[1] "The output file prefix is ../Figure1_Cluster_II_Bcom/"
+treat
+ASS-ILD      HD 
+   2296    1619 
+[1] "Load success"
+
+      Naive B lgM+ Memory B lgM- Memory B        Plasma 
+         2601           866           221           227 
+[1] "count and subset"
+[1] "count and subset"
+[1] "The output PATH is ../Figure1_Cluster_II_Bcom/"
+[1] "The output figure is cluster.primary.pdf"
+[1] "The output figure is cluster.primary.patient.pdf"
+[1] "The output figure is cluster.markers.vln.pdf"
+[1] "The output figure is cluster.markers.vln.rev.pdf"
+[1] "The output figure is cluster.markers.dot.rev.pdf"
+null device 
+          1 
+[1] "The output PATH is ../Figure1_Cluster_II_Bcom/"
+[1] "The output figure is count_patient_proportion.pdf"
+[1] "The output figure is count_treat_proportion.pdf"
+[1] "The output figure is count_treat_box.pdf"
+[1] "Process success"
+[1] "***************"
+[1] ""

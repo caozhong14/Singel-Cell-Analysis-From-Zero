@@ -1,0 +1,29 @@
+[1] "The input file is ../output/ASSHD_pbmc_subcluster_Tcom.rds"
+[1] "The input celltype is celltypeII_T"
+[1] "The output file prefix is ../Figure1_Cluster_II_Tcom/"
+treat
+ASS-ILD      HD 
+  10455   11360 
+[1] "Load success"
+
+CD4 Naive   CD4 TCM   CD4 TEM CD8 Naive   CD8 TEM       gdT      Treg       NKT 
+     4772      5022      1758      1783      4792      1223       819       802 
+     MAIT       DNT     Pro T 
+      664       105        75 
+[1] "count and subset"
+[1] "count and subset"
+[1] "The output PATH is ../Figure1_Cluster_II_Tcom/"
+[1] "The output figure is cluster.primary.pdf"
+[1] "The output figure is cluster.primary.patient.pdf"
+[1] "The output figure is cluster.markers.vln.pdf"
+[1] "The output figure is cluster.markers.vln.rev.pdf"
+[1] "The output figure is cluster.markers.dot.rev.pdf"
+null device 
+          1 
+[1] "The output PATH is ../Figure1_Cluster_II_Tcom/"
+[1] "The output figure is count_patient_proportion.pdf"
+[1] "The output figure is count_treat_proportion.pdf"
+[1] "The output figure is count_treat_box.pdf"
+[1] "Process success"
+[1] "***************"
+[1] ""
