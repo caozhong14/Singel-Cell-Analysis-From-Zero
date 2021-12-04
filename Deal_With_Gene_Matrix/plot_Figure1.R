@@ -191,8 +191,9 @@ if (TRUE) {
                         "IL7R", "CCR7", "SELL", "TCF7", "LEF1", "LTB", "S100A4",  # Naive/TCM
                         "GPR183",
                         "GZMA", "GZMB", "GZMH", "GZMK", "GZMM", "GNLY", # Effector
+                        "TRDC",
                         "MKI67", "RRM2", # ProT
-                        "FCGR3A", "NKG7", # NK
+                        "FCGR3A", "NKG7", "KLRF1", # NK
                         "CD14", "MS4A7", "LYZ", "S100A8", "S100A9", # Mono
                         "CD19", "MS4A1",  # B
                         "CD1C", "CLEC10A", 
@@ -219,13 +220,26 @@ if (TRUE) {
                       "IL7R", "CCR7", "SELL", "TCF7", "LEF1", "LTB", "S100A4", "S100A11", "MAL",
                       "GPR183",
                       "LINC02446", 
-                      "GZMA", "GZMB", "GZMH", "GZMK", "GNLY", "FGFBP2", "TRBV20-1", "TNFRSF4", 
+                      "GZMA", "GZMB", "GZMH", "GZMK", "GNLY", "FGFBP2", "TRBV20-1", 
                       "FCGR3A", "NKG7", "TYROBP", 
                       "TRGV9", "TRDV2", # gdT
                       "FOXP3", "CTLA4", # Treg
                       "TRAV1-2", "SLC4A10", # MAIT
                       "MKI67", "RRM2" # ProT
                       )
+    if (opts$input == "../output/ASSHD_pbmc_subcluster_T.rds") {
+      vln.features <- c("CD3D", "CD4", "CD8A",
+                        "IL7R", "CCR7", "SELL", "TCF7", "LEF1", "LTB", "S100A4", "S100A11", "MAL",
+                        "GPR183",
+                        "LINC02446", 
+                        "GZMA", "GZMB", "GZMH", "GZMK", "GNLY", "FGFBP2", "TRBV20-1", "TRBV7-2", "TRAV27",
+                        "FCGR3A", "NKG7", "TYROBP", 
+                        "TRGV9", "TRDV2", # gdT
+                        "FOXP3", "CTLA4", # Treg
+                        "TRAV1-2", "SLC4A10", # MAIT
+                        "MKI67", "RRM2" # ProT
+                        )
+    }
     feat.features <- vln.features
   }
   # if (opts$celltype == "celltypeII_B"){
