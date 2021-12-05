@@ -1,13 +1,13 @@
 library(gplots)
 library(ggplot2)
 
-input_list <- c("/Users/caozhong/tmp/DEG_gene_analysis_choose/T GO.csv",
-                "/Users/caozhong/tmp/DEG_gene_analysis_choose/B GO.csv",
-                "/Users/caozhong/tmp/DEG_gene_analysis_choose/CD14 GO.csv",
-                "/Users/caozhong/tmp/DEG_gene_analysis_choose/CD16 GO.csv",
-                "/Users/caozhong/tmp/DEG_gene_analysis_choose/NK GO.csv",
-                "/Users/caozhong/tmp/DEG_gene_analysis_choose/T KEGG.csv",
-                "/Users/caozhong/tmp/DEG_gene_analysis_choose/B KEGG.csv")
+input_list <- c("../Figure2_DEG/T_GO.csv",
+                "../Figure2_DEG/B_GO.csv",
+                "../Figure2_DEG/CD14mono_GO.csv",
+                "../Figure2_DEG/CD16mono_GO.csv",
+                "../Figure2_DEG/NK_GO.csv",
+                "../Figure2_DEG/T_KEGG.csv",
+                "../Figure2_DEG/B_KEGG.csv")
 
 output_list <- c("T GO ",
                  "B GO ",
@@ -17,8 +17,11 @@ output_list <- c("T GO ",
                  "T KEGG ",
                  "B KEGG ")
 
-PATH = "TMP"
+PATH = "../Figure2_DEG/"
 
+if (!dir.exists(PATH)){
+  dir.create(path = PATH, recursive = TRUE)
+} 
 
   
 funppplot <- function(input_name, output_name) {
@@ -53,8 +56,15 @@ funppplot <- function(input_name, output_name) {
          title=titlename) +
     theme_bw()
   
-  ggsave(savename1, p1, path = PATH, width = 10, height = 7)
-  ggsave(savename2, p2, path = PATH, width = 10, height = 7)  
+  if (endsWith(input_name, "KEGG.csv")){
+    print ("KEGG")
+    ggsave(savename1, p1, path = PATH, width = 10, height = 3.5)
+    ggsave(savename2, p2, path = PATH, width = 10, height = 3.5)      
+  }else{
+    print("GO")
+    ggsave(savename1, p1, path = PATH, width = 10, height = 7)
+    ggsave(savename2, p2, path = PATH, width = 10, height = 7)      
+  }
 }
 
 ## MAIN

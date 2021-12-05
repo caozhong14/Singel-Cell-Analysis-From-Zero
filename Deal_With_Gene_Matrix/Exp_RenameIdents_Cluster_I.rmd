@@ -163,8 +163,10 @@ pbmc <- RenameIdents(pbmc,
             "13" = "doublet")
 cluster.names <-  c("Naive T", "TCM", "TEM", "gdT", "Pro T", "NK", "CD14 Mono", "CD16 Mono", "B", "DC", "pDC", "Platelet", "doublet")
 levels(x = pbmc) <- cluster.names
+
 plot.cluster.primary <- DimPlot(pbmc, reduction = "umap", label = "TRUE", label.size = 3, repel = TRUE)
 pbmc[["celltypeI"]] <- Idents(pbmc)
+saveRDS(pbmc, file = "../output/ASSHD_pbmc_cluster.rds")
 ```
 
 ```{r tc.rename.idents.ASSILDHD}
@@ -195,3 +197,38 @@ pbmc[["celltypeI"]] <- Idents(pbmc)
 
 saveRDS(pbmc, file = "../output/ASSHD_pbmc_cluster_com.rds")
 ```
+
+
+```{r loadrds}
+
+my16colors <- c("#D93424", "#5186B5", "#60B345", "#895095", "#EA7E1C", 
+                "#E7E086", "#9F5425", "#A0CBE1", "#959597", "#5BB89D", 
+                "#E74641", "#8F9CC6", "#DA84B4", "#9FCA5A", "#EBAC6A", "#84B0CA")
+r16colors <- c("#FF5AA3", "#FF4ED5", "#FF5DF4", "#D674FF", "#7F95FC", 
+               "#008DBE", "#00BCE6", "#00C2C7", "#00C598", "#00C25D", 
+               "#00B000", "#6DAF00", "#AAA400", "#D29400", "#EF8300", "#FF6F6A", "#EF8300")
+colors = c(my16colors, r16colors)
+
+# pbmc <- readRDS("../output/ASSHD_pbmc_cluster.rds")
+DefaultAssay(pbmc) <- 'RNA'
+# pbmc.norm <- NormalizeData(pbmc)
+clusterI.cd4 <- c("CD4")
+plot.cd4vln <- VlnPlot(pbmc.norm, clusterI.cd4, cols = colors) + theme_me
+plot.cd4feat <- FeaturePlot(pbmc.norm, reduction = "umap", clusterI.cd4, label = TRUE) + theme_me
+
+ggsave("plot.cd4vln.pdf", plot.cd4vln, path = PATH,  width = 7, height = 5)
+ggsave("plot.cd4feat.pdf", plot.cd4feat, path = PATH,  width = 7, height = 7)
+
+```
+
+# ```{r CD4/CD8}
+# DefaultAssay(pbmc.norm) <- 'RNA'
+# Idents(pbmc.norm) <- "orig.ident"
+# plot.cd4cd81 <- FeatureScatter(pbmc.norm, feature1 = "CD4", feature2 = "CD8A")
+# ggsave("plot.cd4cd8.pdf", plot.cd4cd8, path = PATH,  width = 7, height = 7)
+
+# Idents(pbmc.norm) <- "orig.ident"
+# plot.cd4cd82 <- FeatureScatter(pbmc.norm, feature1 = "CD4", feature2 = "CD8A")
+# ggsave("plot.cd4cd8.pdf", plot.cd4cd8, path = PATH,  width = 7, height = 7)
+
+# ```

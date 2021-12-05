@@ -78,7 +78,7 @@ tar -zxvf refdata-gex-GRCh38-2020-A.tar.gz
 Official Website.
 https://support.10xgenomics.com/single-cell-gene-expression/software/downloads/latest?
 
-### Install Seurat
+### Install R & Seurat
 
 ```
 wget https://mirrors.tuna.tsinghua.edu.cn/CRAN/src/base/R-4/R-4.1.2.tar.gz
