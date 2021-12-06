@@ -155,22 +155,34 @@ if (TRUE) {
   #                   "CD14", "MS4A7", "LYZ", "S100A8", 
   #                   "CD79A", "MS4A1", "CD1C", "CLEC10A", "LILRA4", "CLEC4C", "PPBP", "GP9")
   # feat.features <- c("CD3D", "CD3G", "CD4", "CD8A", "CD8B", "CCR7", "SELL", "LEF1", "GZMA", "GZMK", "GNLY", "PRF1", "TRDC", "TRDV2", "TRGV9", "TRAV1-2", "SLC4A10", "MKI67", "KLRF", "NCAM1", "FCGR3A", "CD14", "LYZ", "S100A8", "MS4A7", "CD1C", "LILRA4", "CLEC4C", "CD79A", "MZB1", "MS4A1", "PPBP", "GP9")
+  # vln.features <- c("CD3D", #"CD4", "CD8A", "CD8B", 
+  #                     "IL7R", "CCR7", "SELL", "TCF7", "LEF1", "LTB", "S100A4", "S100A11", "MAL", # Naive/TCM
+  #                     "GPR183", "CCL5",  # CD4 TCM
+  #                     "LINC02446", # CD8 Naive
+  #                     "GZMA", "GZMB", "GZMH", "GZMK", "GZMM", "GNLY", "FGFBP2", "TRBV20-1", "TNFRSF4", # Effector
+  #                     "FCGR3A", "NKG7", # NK
+  #                     "TYROBP", "GATA3", "TBX21", "RORC", #
+  #                     "TRGV9", "TRDV2", "TRDC", "CMC1", # gdT
+  #                     "FOXP3", "CTLA4", # Treg
+  #                     "TRAV1-2", "SLC4A10", # MAIT
+  #                     "MKI67", "RRM2", # ProT
+  #                     "CD14", "MS4A7", "LYZ", "S100A8", "S100A9", "LGALS2", "FCN1", "MS4A6A", "IFI30", # Mono
+  #                     "CD19", "MS4A1", "IGHD", "IGHM", "FCER2", "CD19", "CD27", "MZB1", "TCL1A", # B
+  #                     "FCER1A", "CD1C", "CLEC10A", "PLD4", "LILRA4", "CLEC4C", "PPBP", "GP9" # DC, pDC, Platelet
+  #                     )
   vln.features <- c("CD3D", #"CD4", "CD8A", "CD8B", 
-                      "IL7R", "CCR7", "SELL", "TCF7", "LEF1", "LTB", "S100A4", "S100A11", "MAL", # Naive/TCM
-                      "GPR183", "CCL5",  # CD4 TCM
-                      "LINC02446", # CD8 Naive
-                      "GZMA", "GZMB", "GZMH", "GZMK", "GZMM", "GNLY", "FGFBP2", "TRBV20-1", "TNFRSF4", # Effector
-                      "FCGR3A", "NKG7", # NK
-                      "TYROBP", "GATA3", "TBX21", "RORC", #
-                      "TRGV9", "TRDV2", "TRDC", "CMC1", # gdT
-                      "FOXP3", "CTLA4", # Treg
-                      "TRAV1-2", "SLC4A10", # MAIT
+                      "IL7R", "CCR7", "SELL", "TCF7", "LEF1", "LTB", "S100A4",  # Naive/TCM
+                      "GPR183",
+                      "GZMA", "GZMB", "GZMH", "GZMK", "GZMM", "GNLY", # Effector
+                      "TRDC",
                       "MKI67", "RRM2", # ProT
-                      "CD14", "MS4A7", "LYZ", "S100A8", "S100A9", "LGALS2", "FCN1", "MS4A6A", "IFI30", # Mono
-                      "CD19", "MS4A1", "IGHD", "IGHM", "FCER2", "CD19", "CD27", "MZB1", "TCL1A", # B
-                      "FCER1A", "CD1C", "CLEC10A", "PLD4", "LILRA4", "CLEC4C", "PPBP", "GP9" # DC, pDC, Platelet
+                      "FCGR3A", "NKG7", "KLRF1", # NK
+                      "CD14", "MS4A7", "LYZ", "S100A8", "S100A9", # Mono
+                      "CD19", "MS4A1",  # B
+                      "CD1C", "CLEC10A", 
+                      "LILRA4", "CLEC4C", 
+                      "PPBP", "GP9" # DC, pDC, Platelet
                       )
-
   feat.features <- vln.features
   if (opts$celltype == "celltypeI"){
     # vln.features <- c("CD3D", "CCR7", "LEF1", "CD8A", "TRDC", 
@@ -187,7 +199,7 @@ if (TRUE) {
     #                   "CD1C", "CLEC10A", 
     #                   "LILRA4", "CLEC4C", 
     #                   "PPBP", "PF4")
-    vln.features <- c("CD3D", #"CD4", "CD8A", "CD8B", 
+    vln.features <- c("CD3D", "CD4", "CD8A", #"CD8B", 
                         "IL7R", "CCR7", "SELL", "TCF7", "LEF1", "LTB", "S100A4",  # Naive/TCM
                         "GPR183",
                         "GZMA", "GZMB", "GZMH", "GZMK", "GZMM", "GNLY", # Effector
@@ -201,7 +213,7 @@ if (TRUE) {
                         "PPBP", "GP9" # DC, pDC, Platelet
                         )
     feat.features <- vln.features
-    print("To be finished!")
+    # print("To be finished!")
   }
   if (opts$celltype == "celltypeII_T"){
     ## vln.features <- c("CD3D", "CD3G", "CD4", "CD8A",

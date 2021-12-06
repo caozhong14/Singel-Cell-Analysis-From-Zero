@@ -5,7 +5,6 @@ treat
 ASS-ILD      HD 
   29201   25295 
 [1] "Load success"
-[1] "To be finished!"
 
   Naive T       TCM       TEM       gdT     Pro T        NK CD14 Mono CD16 Mono 
      9530      6652      9830       581       250      7018     10893      2256 

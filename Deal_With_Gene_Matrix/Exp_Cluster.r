@@ -81,10 +81,10 @@ if (!file.exists("../output/pbmc_ASSHD_pbmc3k.orig.rds")){
   scrna.list <- PrepSCTIntegration(object.list = scrna.list, anchor.features = features)
   # Perform integration
   scrna.list <- lapply(X=scrna.list, FUN = RunPCA, verbose = FALSE, features = features)
-  pbmc3k.anchors <- FindIntegrationAnchors(object.list = scrna.list, anchor.features = features, normalization.method = "SCT", reduction = "rpca", dim = 1:10)
+  pbmc3k.anchors <- FindIntegrationAnchors(object.list = scrna.list, anchor.features = features, normalization.method = "SCT", reduction = "rpca", dim = 1:15)
   # this command creates an 'integrated' data assay
   rm(scrna.list)
-  pbmc3k <- IntegrateData(anchorset = pbmc3k.anchors, normalization.method = "SCT", dim = 1:10)
+  pbmc3k <- IntegrateData(anchorset = pbmc3k.anchors, normalization.method = "SCT", dim = 1:15)
 
   ######
   #### We then save primary integration of pbmc3k and save it to files.
@@ -125,7 +125,7 @@ if (!file.exists("../output/ASSHD_pbmc_orig.rds")) {
   ##########{r with.batchcorr}
   DefaultAssay(pbmc3k) <- 'RNA'
   pbmc3k[["percent.mt"]] <- PercentageFeatureSet(pbmc3k, pattern = "^MT-")
-  pbmc <- subset(pbmc3k, subset = nFeature_RNA > 500 & nFeature_RNA < 3000 & nCount_RNA < 12000 & percent.mt < 10)
+  pbmc <- subset(pbmc3k, subset = nFeature_RNA > 500 & nFeature_RNA < 3000 & nCount_RNA < h & percent.mt < 10)
 
   DefaultAssay(pbmc) <- "integrated"
   pbmc <- ScaleData(object = pbmc, verbose = FALSE)

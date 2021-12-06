@@ -331,3 +331,43 @@ levels(x = pbmc_T) <- cluster.names
 pbmc_T[["celltypeII_T"]] <- Idents(pbmc_T)
 saveRDS(pbmc_T, file = "../output/ASSHD_pbmc_subcluster_Tcom.rds")
 ```
+
+
+```{r Th genes}
+pbmc <- readRDS("../output/ASSHD_pbmc_subcluster_Tcom.rds")
+DefaultAssay(pbmc) <- 'RNA'
+Idents(pbmc) <- "celltypeII_T"
+
+treat = stringr::str_split(colnames(pbmc),"1|2|3|4|5|6|7|8|9",simplify = T)[,1]
+# treat <- gsub('ASS-ILD', 'ASS', treat)
+# treat <- gsub('HD', 'HD', treat)
+table(treat)
+pbmc@meta.data$treat <- treat
+pbmc.norm <- NormalizeData(pbmc)
+
+cluster.Th = c("RORC", "CCR6", "CCR4", "KLRB1")
+# plot.th17 <- FeaturePlot(pbmc.norm, reduction = "umap", cluster.Th, size=2) + theme_me
+plots <- FeaturePlot(pbmc.norm, reduction = "umap", cluster.Th, combine = FALSE)
+plots <- lapply(X = plots, FUN = function(x) {
+  p <- x + NoLegend() + theme_me
+})
+plot.th17 <- CombinePlots(plots = plots, ncol = 4)
+filename = paste(PATH, "/plot.th17.png",sep="") 
+png(filename, width = 1600, height = 400) 
+print(plot.th17)
+dev.off()
+# ggsave("plot.th17-1.pdf", plot.th17, path = PATH,  width = 14, height = 14)
+
+cluster.Thgenes <- c("HLA-DRB5", "HLA-DQA1", "HLA-DPA1", "HLA-DPB1")
+# plot.th17 <- FeaturePlot(pbmc.norm, reduction = "umap", cluster.The, split.by = "treat" ) + theme_me
+plots <- FeaturePlot(pbmc.norm, reduction = "umap", cluster.Thgenes, split.by = "treat", combine = FALSE)
+plots <- lapply(X = plots, FUN = function(x) {
+  p <- x + NoLegend() + theme_me
+})
+plot.th17DEG <- CombinePlots(plots = plots, ncol = 4)
+filename = paste(PATH, "/plot.th17deg.png",sep="") # cluster_markers_feat.pdf is large for publication, this png is for check
+png(filename, width = 1600, height = 800) 
+print(plot.th17DEG)
+dev.off()
+```
+
