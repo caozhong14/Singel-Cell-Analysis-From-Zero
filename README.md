@@ -9,10 +9,12 @@ Please refer to the file "Easy_Way_To_Use_Cell_Ranger/Cell Ranger workflow.md" t
 Patient: ASS-ILD1, ASS-ILD2, ASS-ILD3, ASS-ILD4, ASS-ILD5
 Control: HD1, HD2, HD3
 
-We have prepared the matrices, you can directly download with the following commands. Please contact to caozhong14@mails.tsinghua.edu.cn to get the download link.
+We are uploading our raw data to GEO database, and the alternative download link is https://www.aliyundrive.com/s/ECGrvFb9DeK. Please contact caozhong@mails.tsinghua.edu.cn to get the download code.
+
+We also prepared the matrices, you can directly download with the following commands. 
 
 ```bash
-wget download_link -O ASS5HD3.zip
+wget http://http://82.157.178.197/f/07240b4a0cba4c77adfb/?dl=1 -O ASS5HD3.zip
 unzip ASS5HD3.zip
 mv ASS5HD3 data_filtered_feature_bc_matrix/
 ```

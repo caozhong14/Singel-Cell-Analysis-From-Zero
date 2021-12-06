@@ -25,7 +25,7 @@ cd scRNA-tools
 |  Software   | version  | function | link
 |  ----  | ----  | ----  | ----  |
 | FastQC  | v0.11.9 | Quality Control | http://www.bioinformatics.babraham.ac.uk/projects/fastqc/ |
-| Cell Ranger  | 5.0.0 | Cell Counter | https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger |
+| Cell Ranger  | 6.0.0 | Cell Counter | https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger |
 
 
 ### Install FastQC_v0.11.9.zip
