@@ -19,7 +19,7 @@ mv ASS5HD3 data_filtered_feature_bc_matrix/
 
 ## Deal with Gene Matrix
 
-Please refer to the files "Deal_With_Gene_Matrix/Exp_run.sh".
+Please refer to the commands "Deal_With_Gene_Matrix/Exp_run.sh".
 
 
 ###  Introduce to Script
