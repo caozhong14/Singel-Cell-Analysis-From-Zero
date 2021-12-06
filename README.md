@@ -6,7 +6,7 @@ Codes for paper "Single-cell transcriptomics reveals peripheral immune responses
 
 Please refer to the file "Easy_Way_To_Use_Cell_Ranger/Cell Ranger workflow.md" to get matrices.
 
-Treatment: ASS-ILD1, ASS-ILD2, ASS-ILD3, ASS-ILD4, ASS-ILD5
+Patient: ASS-ILD1, ASS-ILD2, ASS-ILD3, ASS-ILD4, ASS-ILD5
 Control: HD1, HD2, HD3
 
 We have prepared the matrices, you can directly download with the following commands. Please contact to caozhong14@mails.tsinghua.edu.cn to get the download link.
