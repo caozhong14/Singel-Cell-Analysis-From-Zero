@@ -153,7 +153,7 @@ When the BCL filename is not standardized, we need to rename like, rename 201292
 rename "s/C_5_/C_5_S1_L00/" *
 rename "s/1_R1.fq.gz/R1_001.fq.gz/" *
 rename "s/1_R2.fq.gz/R2_001.fq.gz/" *
-rename "s/fq/fastq/"
+rename "s/fq/fastq/" *
 ```
 
 

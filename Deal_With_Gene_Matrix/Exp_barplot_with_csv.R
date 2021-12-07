@@ -58,12 +58,12 @@ funppplot <- function(input_name, output_name) {
   
   if (endsWith(input_name, "KEGG.csv")){
     print ("KEGG")
-    ggsave(savename1, p1, path = PATH, width = 10, height = 3.5)
-    ggsave(savename2, p2, path = PATH, width = 10, height = 3.5)      
+    ggsave(savename1, p1, path = PATH, width = 10, height = 3)
+    ggsave(savename2, p2, path = PATH, width = 10, height = 3)      
   }else{
     print("GO")
-    ggsave(savename1, p1, path = PATH, width = 10, height = 7)
-    ggsave(savename2, p2, path = PATH, width = 10, height = 7)      
+    ggsave(savename1, p1, path = PATH, width = 10, height = 5)
+    ggsave(savename2, p2, path = PATH, width = 10, height = 5)      
   }
 }
 

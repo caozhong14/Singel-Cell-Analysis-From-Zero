@@ -317,15 +317,19 @@ if (TRUE){
 
 if (TRUE){
   showtext_auto(TRUE)
-  font_add("Times New Roman", regular = "/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman.ttf", 
-           italic = "/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Italic.ttf",
-           bold = "/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Bold_Italic.ttf",
-           bolditalic = "/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Bold.ttf")
+#  font_add("Times New Roman", regular = "/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman.ttf", 
+#           italic = "/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Italic.ttf",
+#           bold = "/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Bold_Italic.ttf",
+#           bolditalic = "/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Bold.ttf")
+  font_add("Times New Roman", regular = "/System/Library/Fonts/Supplemental/Times_New_Roman.ttf", 
+           italic = "/System/Library/Fonts/Supplemental/Times_New_Roman_Italic.ttf",
+           bold = "/System/Library/Fonts/Supplemental/Times_New_Roman_Bold_Italic.ttf",
+           bolditalic = "/System/Library/Fonts/Supplemental/Times_New_Roman_Bold.ttf")
   
   
   PATH = opts$output
   print(paste("The output PATH is ", PATH, sep = ""))
-  ggsave("cluster_primary.pdf", plot.cluster.primary, path = PATH,  width = 7, height = 5)
+  ggsave("cluster_primary.pdf", plot.cluster.primary, path = PATH,  width = 7, height = 7)
   print("The output figure is cluster.primary.pdf",  sep = "")
   ggsave("cluster_primary_patient.pdf", plot.cluster.primary.patient, path = PATH,  width = 16, height = 5)
   print("The output figure is cluster.primary.patient.pdf",  sep = "")
