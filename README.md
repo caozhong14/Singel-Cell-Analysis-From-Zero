@@ -11,7 +11,7 @@ Control: HD1, HD2, HD3
 
 We have uploaded our raw data and processed matrices to GEO database geo@ncbi.nlm.nih.gov, expect to receive an email from GEO curators with GEO accession numbers within 5 business days. And the alternative download link is https://www.aliyundrive.com/s/ECGrvFb9DeK. Please contact caozhong@mails.tsinghua.edu.cn to get the download code.
 
-We also prepared the matrices, you can directly download with the following commands. 
+We also prepared the matrices in an alternative download link, you can directly download with the following commands. 
 
 ```bash
 wget http://http://82.157.178.197/f/07240b4a0cba4c77adfb/?dl=1 -O ASS5HD3.zip
