@@ -14,7 +14,7 @@ We have uploaded our raw data and processed matrices to GEO database geo@ncbi.nl
 We also prepared the matrices in an alternative download link, you can directly download with the following commands. 
 
 ```bash
-wget http://http://82.157.178.197/f/07240b4a0cba4c77adfb/?dl=1 -O ASS5HD3.zip
+wget http://82.157.178.197/f/07240b4a0cba4c77adfb/?dl=1 -O ASS5HD3.zip
 unzip ASS5HD3.zip
 mv ASS5HD3 data_filtered_feature_bc_matrix/
 ```
@@ -62,6 +62,13 @@ bash Exp_run.sh
 
 Then you will get results saved in the folder Singel-Cell-Analysis-From-Zero/output.
 And you can get figures in the folders Singel-Cell-Analysis-From-Zero/Figure*
+
+You can also directly download the results with the following commands. 
+```bash
+cd output
+wget http://82.157.178.197/f/6023f70ec0c740d1bc18/?dl=1 -O ASSHD_pbmc_cluster.rds
+```
+
 
 For more detailed analysis, please refer to our paper: "Single-cell transcriptomics reveals peripheral immune responses in anti-synthetase syndrome-associated interstitial lung disease".
 
