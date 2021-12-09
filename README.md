@@ -9,7 +9,8 @@ Please refer to the file "Easy_Way_To_Use_Cell_Ranger/Cell Ranger workflow.md" t
 Patient: ASS-ILD1, ASS-ILD2, ASS-ILD3, ASS-ILD4, ASS-ILD5
 Control: HD1, HD2, HD3
 
-We have uploaded our raw data and processed matrices to GEO database geo@ncbi.nlm.nih.gov, expect to receive an email from GEO curators with GEO accession numbers within 5 business days. And the alternative download link is https://www.aliyundrive.com/s/ECGrvFb9DeK. Please contact caozhong@mails.tsinghua.edu.cn to get the download code.
+We have uploaded our raw data and processed matrices to GEO database. You may view our GSE190510 study at:
+https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE190510. Dataset GSE190510 is scheduled to be publicly-available on: Dec 10, 2021 according to GEO office. Before dataset is available publicly, please contact caozhong@mails.tsinghua.edu.cn to get the review access link.
 
 We also prepared the matrices in an alternative download link, you can directly download with the following commands. 
 
